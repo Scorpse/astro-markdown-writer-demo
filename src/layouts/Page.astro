@@ -1,0 +1,65 @@
+---
+import { site } from "../site";
+import { sitePath } from "../lib/posts";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const pageTitle = title ? title + " · " + site.title : site.title;
+---
+<!doctype html>
+<html lang={site.language}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="alternate" type="application/rss+xml" title={site.title} href={sitePath("rss.xml")} />
+    <script is:inline>
+      let savedTheme;
+      try { savedTheme = localStorage.getItem("field-notes-theme"); } catch {}
+      document.documentElement.dataset.theme =
+        savedTheme === "light" || savedTheme === "dark"
+          ? savedTheme
+          : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="frame header-row">
+        <a class="brand" href={sitePath()}>{site.title}</a>
+        <nav aria-label="Main navigation">
+          <a href={sitePath("archive/")}>Archive</a>
+          <a href={sitePath("rss.xml")}>RSS</a>
+          <button id="theme-toggle" type="button" hidden>Dark mode</button>
+        </nav>
+      </div>
+    </header>
+    <main id="main" class="frame">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="frame"><a href={sitePath()}>{site.title}</a></div>
+    </footer>
+    <script>
+      const button = document.querySelector<HTMLButtonElement>("#theme-toggle");
+      const root = document.documentElement;
+      if (button) {
+        button.hidden = false;
+        const updateButton = () => button.setAttribute("aria-pressed", String(root.dataset.theme === "dark"));
+        updateButton();
+        button.addEventListener("click", () => {
+          root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+          try { localStorage.setItem("field-notes-theme", root.dataset.theme); } catch {}
+          updateButton();
+        });
+      }
+    </script>
+  </body>
+</html>

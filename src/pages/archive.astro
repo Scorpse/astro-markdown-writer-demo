@@ -1,0 +1,11 @@
+---
+import Page from "../layouts/Page.astro";
+import PostList from "../components/PostList.astro";
+import { publishedPosts } from "../lib/posts";
+
+const posts = await publishedPosts();
+---
+<Page title="Archive">
+  <header class="masthead"><h1>Archive</h1></header>
+  <PostList posts={posts} />
+</Page>

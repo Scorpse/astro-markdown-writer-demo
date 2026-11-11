@@ -1,0 +1,16 @@
+---
+import Page from "../layouts/Page.astro";
+import PostList from "../components/PostList.astro";
+import { publishedPosts, sitePath } from "../lib/posts";
+import { site } from "../site";
+
+const posts = await publishedPosts();
+---
+<Page>
+  <header class="masthead">
+    <h1>{site.title}</h1>
+    <p>{site.description}</p>
+  </header>
+  <PostList posts={posts.slice(0, 5)} />
+  {posts.length > 5 && <p class="archive-link"><a href={sitePath("archive/")}>View the archive →</a></p>}
+</Page>
